@@ -21,6 +21,7 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/movies', require('./routes/movieRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
 app.use('/api/recommendations', require('./routes/recommendationRoutes'));
+app.use('/api/ratings', require('./routes/ratingRoutes'));
 
 app.get('/', (req, res) => {
   res.send('SilverScreened Backend Running');

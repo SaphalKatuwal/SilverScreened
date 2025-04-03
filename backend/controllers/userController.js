@@ -186,6 +186,76 @@ const getWatchedDetails = async (req, res) => {
   }
 };
 
+const getSuggestedUsers = async (req, res) => {
+  try {
+    // Get users that the current user is not following
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const suggestedUsers = await User.find({
+      _id: { $ne: req.user._id },
+      _id: { $nin: user.following }
+    })
+    .select('email username watchedMovies')
+    .limit(5);
+
+    res.json(suggestedUsers);
+  } catch (error) {
+    console.error('Error getting suggested users:', error);
+    res.status(500).json({ error: 'Failed to get suggested users' });
+  }
+};
+
+const getUserActivity = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .populate('watchedMovies')
+      .populate('watchlist')
+      .populate('reviews');
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const activities = [];
+
+    // Add watched movies
+    user.watchedMovies.forEach(movie => {
+      activities.push({
+        type: 'watch',
+        movieId: movie._id,
+        movieTitle: movie.title,
+        timestamp: movie.watchedAt || new Date()
+      });
+    });
+
+    // Add watchlist additions
+    user.watchlist.forEach(movie => {
+      activities.push({
+        type: 'watchlist',
+        movieId: movie._id,
+        movieTitle: movie.title,
+        timestamp: movie.addedAt || new Date()
+      });
+    });
+
+    // Add reviews
+    user.reviews.forEach(review => {
+      activities.push({
+        type: 'review',
+        movieId: review.movie,
+        movieTitle: review.movieTitle,
+        timestamp: review.createdAt
+      });
+    });
+
+    // Sort activities by timestamp and get the 5 most recent
+    activities.sort((a, b) => b.timestamp - a.timestamp);
+    res.json(activities.slice(0, 5));
+  } catch (error) {
+    console.error('Error getting user activity:', error);
+    res.status(500).json({ error: 'Failed to get user activity' });
+  }
+};
+
 module.exports = {
   getProfile,
   updateProfile,
@@ -197,4 +267,6 @@ module.exports = {
   getFriends,
   getFollowers,
   getWatchedDetails,
+  getSuggestedUsers,
+  getUserActivity,
 };

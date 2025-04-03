@@ -11,7 +11,10 @@ const userSchema = new mongoose.Schema({
   watchlist: [{ type: String }],
   watchedMovies: [{ movieId: String, watchedAt: { type: Date, default: Date.now } }],
   reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
+  ratings: [{ movieId: String, rating: { type: Number, min: 1, max: 5 } }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  createdAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model('User', userSchema);

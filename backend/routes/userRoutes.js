@@ -13,6 +13,8 @@ const {
   getFriends,
   getFollowers,
   getWatchedDetails,
+  getSuggestedUsers,
+  getUserActivity,
 } = require('../controllers/userController');
 
 router.get('/profile', auth, getProfile);
@@ -25,5 +27,7 @@ router.post('/unfollow', auth, unfollowUser);
 router.get('/friends', auth, getFriends);
 router.get('/followers', auth, getFollowers);
 router.get('/watched-details', auth, getWatchedDetails);
+router.get('/suggested', auth, getSuggestedUsers);
+router.get('/activity', auth, getUserActivity);
 
 module.exports = router;
